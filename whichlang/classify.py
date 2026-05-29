@@ -40,32 +40,48 @@ JUDGE_SYSTEM = (
     "- Use 'cpp' for C++, 'csharp' for C#, 'bash' for shell scripts (sh/bash/zsh)."
 )
 
+# Canonical lowercase tokens we accept. Anything else gets rescued or marked "none".
+_CANONICAL = {
+    "python", "javascript", "typescript", "go", "rust", "ruby", "java",
+    "c", "cpp", "csharp", "php", "bash", "perl", "swift", "kotlin",
+    "html", "elixir", "scala", "haskell", "clojure", "dart", "lua",
+    "r", "julia", "zig", "ocaml", "fsharp", "erlang", "none",
+}
+
 # Aliases the judge sometimes emits → canonical form.
 _ALIAS = {
-    "js": "javascript",
-    "node": "javascript",
-    "nodejs": "javascript",
-    "node.js": "javascript",
+    "js": "javascript", "node": "javascript", "nodejs": "javascript", "node.js": "javascript",
     "ts": "typescript",
-    "py": "python",
-    "py3": "python",
-    "python3": "python",
+    "py": "python", "py3": "python", "python3": "python",
     "golang": "go",
     "rs": "rust",
     "rb": "ruby",
-    "sh": "bash",
-    "shell": "bash",
-    "zsh": "bash",
-    "c++": "cpp",
-    "cplusplus": "cpp",
-    "c#": "csharp",
-    "cs": "csharp",
+    "sh": "bash", "shell": "bash", "zsh": "bash",
+    "c++": "cpp", "cplusplus": "cpp",
+    "c#": "csharp", "cs": "csharp",
+    "fs": "fsharp", "f#": "fsharp",
 }
 
 
-def _normalize(token: str) -> str:
-    t = re.sub(r"[^a-z0-9+#.]", "", token.strip().lower())
-    return _ALIAS.get(t, t) or "none"
+def _normalize(raw: str) -> str:
+    """Map a judge reply (ideally one token, sometimes prose) to a canonical token."""
+    s = raw.strip().lower()
+    # Strict path: judge replied with one token (possibly punctuated).
+    one = re.sub(r"[^a-z0-9+#.]", "", s)
+    if one in _CANONICAL:
+        return one
+    if one in _ALIAS:
+        return _ALIAS[one]
+    # Rescue: judge wrote prose. Scan for a known canonical / aliased word.
+    # Word-boundary scan so "python" inside "monkeypython" wouldn't match,
+    # and we hit the FIRST language the judge mentioned (usually its verdict).
+    for match in re.finditer(r"[a-z][a-z0-9+#.]*", s):
+        w = match.group(0)
+        if w in _CANONICAL:
+            return w
+        if w in _ALIAS:
+            return _ALIAS[w]
+    return "none"
 
 
 def classify_language(response_text: str) -> str:

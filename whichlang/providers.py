@@ -48,10 +48,14 @@ def _openai_complete(spec: ModelSpec, prompt: str, system: Optional[str]) -> str
     if system:
         messages.append({"role": "system", "content": system})
     messages.append({"role": "user", "content": prompt})
+    # GPT-5 / o-series spend tokens on hidden reasoning that counts against
+    # max_completion_tokens. With 2048, GPT-5 burned the whole budget thinking and
+    # returned empty content (finish_reason="length") ~64% of the time. 16384 leaves
+    # ample room for reasoning + the actual code response.
     resp = client.chat.completions.create(
         model=spec.model_id,
         messages=messages,
-        max_completion_tokens=2048,
+        max_completion_tokens=16384,
     )
     return resp.choices[0].message.content or ""
 
