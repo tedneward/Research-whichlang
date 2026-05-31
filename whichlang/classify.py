@@ -16,11 +16,18 @@ from .providers import ModelSpec, complete
 
 
 # Judge config — cheap, fast, deterministic-ish.
+#JUDGE_SPEC = ModelSpec(
+#    id="judge",
+#    provider="anthropic",
+#    model_id="claude-haiku-4-5-20251001",
+#    display_name="judge",
+#)
 JUDGE_SPEC = ModelSpec(
     id="judge",
-    provider="anthropic",
-    model_id="claude-haiku-4-5-20251001",
+    provider="openai_compatible",
+    model_id="gemma4:e4b",
     display_name="judge",
+    base_url="http://localhost:11434/v1",
 )
 
 JUDGE_SYSTEM = (
