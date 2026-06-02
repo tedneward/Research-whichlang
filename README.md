@@ -13,9 +13,12 @@ never invite the model to choose one — that would change what's being measured
 ### Local-LLM notes/modifications
 I (Ted) had to make a few changes to the code in order to get it to run
 reasonably well on my desktop (Windows/WSL, 96GB RAM, Geforce 4090 w/48GB VRAM). One, I had
-to run it with `--concurrency 1`, as the GPU was a serialization point, particularly when the
-runs crossed into new models--currently (I believe) the Ollama inference engine cannot have
-two models loaded simultaneously on the video card, even if there's enough VRAM to hold both.
+to run it with `--concurrency 1` (which I would suggest should be the default, personally); 
+because the GPU was a serialization point, particularly when the runs crossed into new 
+models--currently (I believe) the Ollama inference engine cannot have two models loaded 
+simultaneously on the video card, even if there's enough VRAM to hold both. If I allowed the
+default concurrency, I would get infrequent errors that would disappear on subsequent runs.
+
 More importantly, perhaps, I had to make a change to `classify.py` to make use of a local
 model, as I wanted everything--generation as well as classification--to be local, as I'm
 a cheap bastard who doesn't want to give anything to the cloud models if I can help it. I also
@@ -27,7 +30,10 @@ Lastly, I obviously had to update the `models.yaml` file to include local models
 the most popular (by a very anecdotal skim) models: gemma4, gpt-oss, glm-4.7-flash, qwen3.6,
 and qwen3-coder. All of these were run in Ollama, using their default context windows,
 with no explicit system prompt (just whatever Ollama might default to as the inference engine
-host). All were the latest as of 1 June 2026, obtained via `ollama pull`.
+host). All were the latest as of 1 June 2026, obtained via `ollama pull`. Note, the code in
+`providers.py` expects that there MUST BE an environment variable for each and every model,
+even when running locally where none is necessary. If you get `KeyError`s running it locally,
+do an `export OPENAI_API_KEY=foo` to make the Python code happy.
 
 ---
 
@@ -89,9 +95,10 @@ constraint, and the picks across models diverge meaningfully:
 
 ### Local-LLM Headline findings
 
-**On tier-1 (small tasks): Python is the universal default.** All the local models
+**On tier-1 (small tasks): Python is the universal default.** Pretty much the same
+as the cloud models--they all defaulted to Python for the small stuff.
 
-
+**On tier-2 (substantial tasks): ...**
 
 
 ### Default language overall (tier-1 + tier-2 combined)
