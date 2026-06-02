@@ -10,6 +10,25 @@ script that..." or "a small web app for...", what am I going to get back?*
 The whole point is the **defaults**. Prompts deliberately never mention a language and
 never invite the model to choose one — that would change what's being measured.
 
+### Local-LLM notes/modifications
+I (Ted) had to make a few changes to the code in order to get it to run
+reasonably well on my desktop (Windows/WSL, 96GB RAM, Geforce 4090 w/48GB VRAM). One, I had
+to run it with `--concurrency 1`, as the GPU was a serialization point, particularly when the
+runs crossed into new models--currently (I believe) the Ollama inference engine cannot have
+two models loaded simultaneously on the video card, even if there's enough VRAM to hold both.
+More importantly, perhaps, I had to make a change to `classify.py` to make use of a local
+model, as I wanted everything--generation as well as classification--to be local, as I'm
+a cheap bastard who doesn't want to give anything to the cloud models if I can help it. I also
+renamed the `runs.jsonl` to `cloudruns.jsonl` and the `REPORT.md` to `CLOUDREPORT.md` so as
+to clear the way for the local runs (particularly since I had to do some debugging and
+it was easier to do with an empty runs file).
+
+Lastly, I obviously had to update the `models.yaml` file to include local models, and I used
+the most popular (by a very anecdotal skim) models: gemma4, gpt-oss, glm-4.7-flash, qwen3.6,
+and qwen3-coder. All of these were run in Ollama, using their default context windows,
+with no explicit system prompt (just whatever Ollama might default to as the inference engine
+host). All were the latest as of 1 June 2026, obtained via `ollama pull`.
+
 ---
 
 ## Latest results
@@ -24,7 +43,7 @@ The task set is split into two tiers:
   domain). Tasks with scale, platform, or domain constraints that make the universal
   Python default actually wrong — designed to surface real differentiation.
 
-### Headline findings
+### Cloud-LLM Headline findings
 
 **On tier-1 (small tasks): Python is the universal default.** All 8 models default to
 Python overall. Scripting and CLI tasks are Python ~100% of the time across the board.
@@ -67,6 +86,13 @@ constraint, and the picks across models diverge meaningfully:
   appropriately by task more than any other model in the test.
 - **Solidity recognition is universal.** 11/11 models wrote Solidity unprompted
   for the DAO contract. No model hallucinated a "smart-contract.py" anywhere.
+
+### Local-LLM Headline findings
+
+**On tier-1 (small tasks): Python is the universal default.** All the local models
+
+
+
 
 ### Default language overall (tier-1 + tier-2 combined)
 

@@ -25,7 +25,7 @@ from .providers import ModelSpec, complete
 JUDGE_SPEC = ModelSpec(
     id="judge",
     provider="openai_compatible",
-    model_id="gemma4:e4b",
+    model_id="gemma4",
     display_name="judge",
     base_url="http://localhost:11434/v1",
 )
