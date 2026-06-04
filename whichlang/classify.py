@@ -96,9 +96,10 @@ def _normalize(raw: str) -> str:
     return "none"
 
 
-def classify_language(response_text: str) -> str:
-    """Send response to judge; return canonical lowercase language token, or 'none'."""
+def classify_language(response_text: str) -> tuple[str, str]:
+    """Send response to judge; return canonical lowercase language token and raw judgment."""
     if not response_text or not response_text.strip():
-        return "none"
+        return "none", "No response to judge"
     raw = complete(JUDGE_SPEC, response_text, system=JUDGE_SYSTEM)
-    return _normalize(raw)
+    print(f"Judge raw response: {raw}")
+    return (_normalize(raw), raw)

@@ -95,8 +95,13 @@ constraint, and the picks across models diverge meaningfully:
 
 ### Local-LLM Headline findings
 
-**On tier-1 (small tasks): Python is the universal default.** Pretty much the same
-as the cloud models--they all defaulted to Python for the small stuff.
+**On tier-1 (small tasks): Python is generally the default.** That said, there were some surprises.
+
+GLM-4.7-flash was first: two of the responses (classified `none`) the LLM delivered were a multiple-language
+response, despite the prompt explicitly saying to *not* do that, and one response was `javascript`.
+In another case during the `rename-photos` run, the *judge* actually posted a solution. (I only discovered this
+because I had left a `print()` debugging statement in the `classify.py` code when I ran it.) GLM did the same
+thing again in one of the `scrape_h1` classifiers.
 
 **On tier-2 (substantial tasks): ...**
 
@@ -136,6 +141,9 @@ See [REPORT.md](REPORT.md) for the full model × task grid and per-category brea
    model produced it, so it can't bias toward expected defaults.
 5. **`whichlang/report.py`** — aggregates JSONL → `REPORT.md`: per-model defaults,
    per-category breakdowns, and the full model × task grid.
+6. **`whichlang/extract.py`** - extracts the responses out of the `runs.jsonl` file in order
+   to examine the responses more easily. Writes by default to an `extractions` directory
+   that is a peer to `results`.
 
 ### Methodology notes
 

@@ -93,9 +93,10 @@ def _run_one(
         response = complete(spec, task["prompt"], system=SYSTEM_PROMPT)
         elapsed_ms = int((time.time() - t0) * 1000)
         try:
-            language = classify_language(response)
+            (language, judgement) = classify_language(response)
             classify_err = None
         except Exception as e:
+            print("Error during classification:", e)
             language = "error"
             classify_err = f"{type(e).__name__}: {e}"
         return {
@@ -107,9 +108,12 @@ def _run_one(
             "elapsed_ms": elapsed_ms,
             "response": response,
             "classify_error": classify_err,
+            "judgement": judgement,
             "error": None,
+            "error_text": None
         }
     except Exception as e:
+        print("Error during completion:", e)
         return {
             "model_id": spec.id,
             "task_id": task["id"],
@@ -119,7 +123,9 @@ def _run_one(
             "elapsed_ms": int((time.time() - t0) * 1000),
             "response": None,
             "classify_error": None,
+            "judgement": None,
             "error": f"{type(e).__name__}: {e}",
+            "error_text": str(e)
         }
 
 
